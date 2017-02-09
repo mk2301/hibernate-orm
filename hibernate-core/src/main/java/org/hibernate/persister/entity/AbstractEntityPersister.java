@@ -297,7 +297,7 @@ public abstract class AbstractEntityPersister
 
 	protected abstract boolean isClassOrSuperclassTable(int j);
 
-	protected abstract int getSubclassTableSpan();
+	public abstract int getSubclassTableSpan();
 
 	protected abstract int getTableSpan();
 
@@ -944,8 +944,10 @@ public abstract class AbstractEntityPersister
 					session.getPersistenceContext().addUninitializedCollection( persister, collection, key );
 				}
 
-				// Initialize it
-				session.initializeCollection( collection, false );
+				// HHH-11161 Initialize, if the collection is not extra lazy
+				if ( !persister.isExtraLazy() ) {
+					session.initializeCollection( collection, false );
+				}
 				interceptor.attributeInitialized( fieldName );
 
 				if ( collectionType.isArrayType() ) {
